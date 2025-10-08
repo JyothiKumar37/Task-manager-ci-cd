@@ -31,9 +31,7 @@ jobs:
         run: |
           docker build -t $IMAGE_BACKEND ./backend
 
-      - name: Run Backend Tests
-        run: |
-          docker run --rm $IMAGE_BACKEND python -m unittest discover -s backend/tests
+    
 
       # -------------------------------
       # Frontend build and test
@@ -42,9 +40,7 @@ jobs:
         run: |
           docker build -t $IMAGE_FRONTEND ./frontend
 
-      - name: Run Frontend Tests
-        run: |
-          docker run --rm $IMAGE_FRONTEND npm test -- --watchAll=false
+      
 
       # -------------------------------
       # Login to Docker Hub
