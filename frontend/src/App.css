@@ -1,0 +1,41 @@
+.container {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  margin-top: 50px;
+}
+
+.add-task input {
+  padding: 10px;
+  margin-right: 10px;
+  width: 250px;
+}
+
+.add-task button {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.task-list li {
+  padding: 10px;
+  background-color: #f3f3f3;
+  margin: 8px auto;
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
