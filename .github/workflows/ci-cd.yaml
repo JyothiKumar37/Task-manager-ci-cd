@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  IMAGE_BACKEND: task-manager-backend
+  IMAGE_FRONTEND: task-manager-frontend
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # -------------------------------
+      # Backend build and test
+      # -------------------------------
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t $IMAGE_BACKEND ./backend
+
+      - name: Run Backend Tests
+        run: |
+          docker run --rm $IMAGE_BACKEND python -m unittest discover -s backend/tests
+
+      # -------------------------------
+      # Frontend build and test
+      # -------------------------------
+      - name: Build Frontend Docker Image
+        run: |
+          docker build -t $IMAGE_FRONTEND ./frontend
+
+      - name: Run Frontend Tests
+        run: |
+          docker run --rm $IMAGE_FRONTEND npm test -- --watchAll=false
+
+      # -------------------------------
+      # Login to Docker Hub
+      # -------------------------------
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      # -------------------------------
+      # Push images
+      # -------------------------------
+      - name: Push Backend Image
+        run: |
+          docker tag $IMAGE_BACKEND $DOCKER_HUB_USERNAME/$IMAGE_BACKEND:latest
+          docker push $DOCKER_HUB_USERNAME/$IMAGE_BACKEND:latest
+
+      - name: Push Frontend Image
+        run: |
+          docker tag $IMAGE_FRONTEND $DOCKER_HUB_USERNAME/$IMAGE_FRONTEND:latest
+          docker push $DOCKER_HUB_USERNAME/$IMAGE_FRONTEND:latest
+
