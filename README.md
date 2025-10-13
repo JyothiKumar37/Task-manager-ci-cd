@@ -61,7 +61,7 @@ task-manager/
 
 1. Clone the repository:
 
-git clone <your-repo-url>
+git clone https://github.com/JyothiKumar37/Task-manager-ci-cd.git
 
 cd task-manager
 
@@ -91,7 +91,7 @@ REACT_APP_API_URL=http://localhost:5000/tasks
 
 Make sure the frontend URL points to the backend API URL to avoid 404 errors.
 
-CI/CD
+CI/CD:
 
 GitHub Actions is configured to:
 
@@ -101,7 +101,7 @@ Push images to Docker Hub
 
 Optionally deploy to a server or cloud instance
 
-Usage
+Usage:
 
 Open the frontend in your browser (http://localhost:3000)
 
