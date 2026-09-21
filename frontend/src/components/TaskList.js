@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
- // backend API endpoint
-const API_URL = process.env.REACT_APP_API_URL
+// backend API endpoint (dynamically resolves hostname if REACT_APP_API_URL is not set or default)
+const getApiUrl = () => {
+  const envUrl = process.env.REACT_APP_API_URL;
+  if (envUrl && envUrl.startsWith("http")) {
+    return envUrl;
+  }
+  const hostname = typeof window !== "undefined" && window.location.hostname ? window.location.hostname : "localhost";
+  return `http://${hostname}:5000/tasks`;
+};
+
+const API_URL = getApiUrl();
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
