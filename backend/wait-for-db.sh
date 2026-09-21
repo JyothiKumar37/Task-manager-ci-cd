@@ -5,7 +5,7 @@ DB_HOST=$(python3 -c "import os, urllib.parse; u=urllib.parse.urlsplit(os.getenv
 DB_PORT=$(python3 -c "import os, urllib.parse; u=urllib.parse.urlsplit(os.getenv('DATABASE_URL', '')); print(u.port or 5432)")
 
 echo "Waiting for database at $DB_HOST:$DB_PORT..."
-while ! nc -z "$DB_HOST" "$DB_PORT"; do
+while ! nc -z -w 3 "$DB_HOST" "$DB_PORT"; do
   sleep 2
 done
 echo "Database is ready, starting server..."
