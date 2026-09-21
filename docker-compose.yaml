@@ -4,8 +4,6 @@ services:
     container_name: backend
     ports:
       - "5000:5000"
-    # depends_on:
-    #   - db # Uncomment if using local postgres container instead of AWS RDS
     env_file:
       - .env
     networks:
@@ -23,23 +21,7 @@ services:
     networks:
       - app-network
 
-  db:
-    image: postgres:13
-    container_name: db
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-volumes:
-  pgdata:
-
 networks:
   app-network:
+
 
