@@ -8,7 +8,8 @@ import psycopg2
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+db_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432/tasksdb")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "defaultsecret")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -16,18 +17,12 @@ db = SQLAlchemy(app)
 # Wait for Postgres to be ready
 while True:
     try:
-        conn = psycopg2.connect(
-            dbname="tasksdb",
-            user="postgres",
-            password="postgres",
-            host="db",
-            port=5432
-        )
+        conn = psycopg2.connect(db_url)
         conn.close()
         print("Database is ready!")
         break
-    except psycopg2.OperationalError:
-        print("Waiting for database...")
+    except psycopg2.OperationalError as e:
+        print(f"Waiting for database... ({e})")
         time.sleep(2)
 
 class Task(db.Model):
