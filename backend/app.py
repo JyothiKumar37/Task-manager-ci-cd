@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import time
 import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import urllib.parse
 
 app = Flask(__name__)
 CORS(app)
@@ -14,9 +16,44 @@ app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "defaultsecret")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Wait for Postgres to be ready
+def ensure_database_exists(url):
+    parsed = urllib.parse.urlsplit(url)
+    target_db = parsed.path.lstrip('/') or 'tasksdb'
+    if target_db == 'postgres':
+        return
+
+    try:
+        conn = psycopg2.connect(url)
+        conn.close()
+    except psycopg2.OperationalError as e:
+        err_msg = str(e)
+        if "does not exist" in err_msg:
+            print(f"Database '{target_db}' does not exist on server. Creating database automatically...")
+            user = parsed.username or 'postgres'
+            password = parsed.password or ''
+            host = parsed.hostname or 'localhost'
+            port = parsed.port or 5432
+            
+            main_conn = psycopg2.connect(
+                dbname='postgres',
+                user=user,
+                password=password,
+                host=host,
+                port=port
+            )
+            main_conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            cursor = main_conn.cursor()
+            cursor.execute(f'CREATE DATABASE "{target_db}";')
+            cursor.close()
+            main_conn.close()
+            print(f"Database '{target_db}' created successfully!")
+        else:
+            raise e
+
+# Wait for Postgres to be ready and ensure database exists
 while True:
     try:
+        ensure_database_exists(db_url)
         conn = psycopg2.connect(db_url)
         conn.close()
         print("Database is ready!")
